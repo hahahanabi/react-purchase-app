@@ -207,7 +207,6 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
 
   const handleOnSave = (updateTodo) => {
     console.log('Appの元の保存の関数の対象データ',updateTodo);
-
     //詳細ボタンで対象リスト編集、保存
    const updatedTodos = toDos.map((todo) => {
       if(todo.id === updateTodo.id) {
@@ -223,6 +222,17 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
    console.log('Appの元の保存の関数updatedTodos',updatedTodos);
 
    setTodos(updatedTodos);
+  }
+
+  const handleSearchRequestClear = () => {
+    //検索条件初期化
+    //名前検索ref初期化
+    todoSearchNameRef.current.value = null;
+    //日付初期化
+    setStartDate(null);
+    setEndDate(null);
+    //購入フラグ初期化
+    setRadioValue('all');
   }
 
   useEffect(() => {
@@ -300,12 +310,23 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
             ))}
             </ButtonGroup>
           </div>
-          <button 
-            className="ml-40 mt-4 px-2 py-1 text-center bg-sky-400 rounded-md text-lg text-white hover:bg-sky-500" 
-            onClick={handleSearchTodo}
-            >
-            検索
-          </button>
+          <div className="flex items-center justify-center">
+            <div className="flex justify-center flex-1">
+              <button 
+                className="w-40 mt-4 px-2 py-1 text-center bg-sky-400 rounded-md text-lg text-white hover:bg-sky-500" 
+                onClick={handleSearchTodo}
+                >
+                検索
+              </button>
+            </div>
+            <div className="w-40 flex justify-end">
+              <button 
+                className="px-2 py-1 mt-4 text-sky-500 hover:underline"
+                onClick={handleSearchRequestClear}
+                >
+                条件クリア</button>
+            </div>
+          </div>
       </div>
      
       
