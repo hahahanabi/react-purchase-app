@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/react-purchase-app/static/css/main.9e1a1585.css",
+    "main.js": "/react-purchase-app/static/js/main.e115b08c.js",
+    "index.html": "/react-purchase-app/index.html",
+    "main.9e1a1585.css.map": "/react-purchase-app/static/css/main.9e1a1585.css.map",
+    "main.e115b08c.js.map": "/react-purchase-app/static/js/main.e115b08c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9e1a1585.css",
+    "static/js/main.e115b08c.js"
+  ]
+}
