@@ -47,11 +47,15 @@ console.log('setの選択した日付',startDate);
     //保存
     const amount = amountRef.current.value;
     console.log('保存時撮ってきたamount',amount);
+    console.log('保存時撮ってきた日付',startDate);
+    console.log('保存時撮ってきた日付 整形版',format(startDate, 'yyyy-MM-dd'));
+
+
     visibleTodo.amount = amount;
     //日付選択してnullに戻した場合に他の日付が表示されちゃうバグを修正
-    visibleTodo.created_at = startDate !== null ?? format(startDate, 'yyyy-MM-dd', { locale: ja });
+    visibleTodo.created_at = startDate !== null ? format(startDate, 'yyyy-MM-dd', { locale: ja }) : null;
     visibleTodo.memo = memoRef.current.value;
-
+console.log('リストの編集時保存時のvisibleTodo',visibleTodo);
     handleOnSave(visibleTodo);
     amountRef.current.value = null;
     memoRef.current.value = null;

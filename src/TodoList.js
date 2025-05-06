@@ -7,9 +7,10 @@ import { Pagination, Stack } from '@mui/material';
 
 const TodoList = ({todos, visibleTodos, toggleTodo, toggleSelect, handleDeleteSelected, handleOnSave,  ...props}) => {
   //todos.map((todo) => <Todo todo={todo} key={todo.id} toggleTodo={toggleTodo}/>);
+  console.log('リストに来てるvisibleTodos',visibleTodos);
   const [modal, setModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
-
+console.log('選択したtodo',selectedTodo);
   const handlePurchaseFlagChange = (id) => {
     //購入フラグ変更
     toggleTodo(id);
