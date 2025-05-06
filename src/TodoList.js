@@ -61,7 +61,7 @@ const TodoList = ({todos, visibleTodos, toggleTodo, toggleSelect, handleDeleteSe
           </thead>
           <tbody>
               {/* 検索結果なしとかの場合 */}
-              {visibleTodos.length === 0 && <div className="p-2 my-2 mx-2 text-gray-600 text-lg font-medium">※ 条件に一致するリストがありません</div>}
+              {visibleTodos.length === 0 && todos.length !== 0 && <div className="p-2 my-2 mx-2 text-gray-600 text-lg font-medium">※ 条件に一致するリストがありません</div>}
               {/* {visibleTodos.map((todo) => { */}
               {paginatedTodos.map((todo) => {
                 //<Todo todo={todo} key={todo.id} toggleTodo={toggleTodo}/>

@@ -16,8 +16,8 @@ const Todo = ({visibleTodo, toggleTodo, show, onHide, handleOnSave}) => {
   console.log('モーダルにきてるvisibleToso',visibleTodo);
   //日付
   //const initialDate = new Date()
-  const [startDate, setStartDate] = useState();
-
+  const [startDate, setStartDate] = useState(null);
+console.log('setの選択した日付',startDate);
   useEffect(() => {
     //選択したリストのデータの初期表示
     if (visibleTodo === null) {
@@ -34,6 +34,7 @@ const Todo = ({visibleTodo, toggleTodo, show, onHide, handleOnSave}) => {
   const handleDateChange = (date) => {
     //日付変更
     setStartDate(date)
+  
   }
 
   //入力
@@ -47,7 +48,8 @@ const Todo = ({visibleTodo, toggleTodo, show, onHide, handleOnSave}) => {
     const amount = amountRef.current.value;
     console.log('保存時撮ってきたamount',amount);
     visibleTodo.amount = amount;
-    visibleTodo.created_at = format(startDate, 'yyyy-MM-dd', { locale: ja });
+    //日付選択してnullに戻した場合に他の日付が表示されちゃうバグを修正
+    visibleTodo.created_at = startDate !== null ?? format(startDate, 'yyyy-MM-dd', { locale: ja });
     visibleTodo.memo = memoRef.current.value;
 
     handleOnSave(visibleTodo);
