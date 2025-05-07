@@ -42,12 +42,12 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
   useEffect(() => {
     console.log('visible変更');
     //表示用のデータに大元データセット（通常はこれ。リロード時）
-    setVisibleTodos(toDos);
+    //setVisibleTodos(toDos);
     //購入フラグ変更ボタン押すと検索結果かわっちゃう（全部表示される）ので修正
     const isVisibleMatch = toDos.length === visibleTodos.length;
     console.log('見た目と元データのデータの数が一致してるか',isVisibleMatch);
-    if (isVisibleMatch === true) {
-      //全データと見た目データの数が一致する場合はそのまま全データを表示
+    if (isVisibleMatch === true ||(visibleTodos.length === 0 && toDos.length !== 0)) {
+      //全データと見た目データの数が一致する場合or画面リロード時（toDosデータあり、visibleデータなしの場合）はそのまま全データを表示
       setVisibleTodos(toDos);
     }
     if (isVisibleMatch === false && visibleTodos.length !== 0) {

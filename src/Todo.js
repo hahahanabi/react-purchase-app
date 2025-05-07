@@ -48,7 +48,6 @@ console.log('setの選択した日付',startDate);
     const amount = amountRef.current.value;
     console.log('保存時撮ってきたamount',amount);
     console.log('保存時撮ってきた日付',startDate);
-    console.log('保存時撮ってきた日付 整形版',format(startDate, 'yyyy-MM-dd'));
 
 
     visibleTodo.amount = amount;
