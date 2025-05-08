@@ -30,11 +30,22 @@ function App() {
   const [addTodoFlag, setAddTodoFlag] = useState(false);
   const todoNameRef = useRef();
   const todoSearchNameRef = useRef();
-console.log('検索窓のインプット',todoSearchNameRef);
+  //検索条件の名前があるかないかで使用↓
+  const [todoSearchName, setTodoSearchName] = useState("");
+console.log('検索窓の名前インプットset関数',todoSearchName);
+console.log('検索窓の名前インプットRef',todoSearchNameRef);
+
+
   //日付
   //const initialDate = new Date()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  //検索条件が入ってるか
+  const [isSearchConditions, setIsSearchConditions] = useState(false);
+  console.log('検索条件が１個でも入ってえるかset関数',isSearchConditions);
+  //検索ボタンが押されたか（検索条件なし＋検索ボタン押下で１ページ目に戻る用）
+  const searchFlagRef = useRef(false);
+  console.log('searchFlagRef',searchFlagRef);
 console.log('日付検索　最初の日付', startDate ? format(startDate, 'yyyy-MM-dd', { locale: ja }) : startDate);
 console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM-dd', { locale: ja }) : endDate);
 
@@ -42,7 +53,6 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
   useEffect(() => {
     console.log('visible変更');
     //表示用のデータに大元データセット（通常はこれ。リロード時）
-    //setVisibleTodos(toDos);
     //購入フラグ変更ボタン押すと検索結果かわっちゃう（全部表示される）ので修正
     const isVisibleMatch = toDos.length === visibleTodos.length;
     console.log('見た目と元データのデータの数が一致してるか',isVisibleMatch);
@@ -63,6 +73,36 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
       setVisibleTodos(toDos);
     }
   },[toDos])
+
+  useEffect(() => {
+    //検索条件が入ってるか
+    console.log('検索条件のuseEffect');
+    const conditionsArr = [todoSearchName, startDate, endDate, radioValue];
+    const target = ["", null, null, "all"];
+    const isEqual = JSON.stringify(conditionsArr) === JSON.stringify(target);
+    
+    console.log('isEqual',isEqual);
+    console.log('conditionsArrの中身',conditionsArr);
+    if (isEqual) {
+      //検索条件なし
+      setIsSearchConditions(false);
+    } else {
+      setIsSearchConditions(true);
+    }
+  },[todoSearchName, startDate, endDate, radioValue]);
+
+  //検索ボタン以外押されたらfalseに制御
+  useEffect(() => {
+    const handleClick = () => {
+      searchFlagRef.current = false;
+    };
+
+    window.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
+  }, []);
 
   //日付検索時の日付の選択
   const handleStartDateChange = (date) => {
@@ -137,11 +177,20 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
   };
 
 
-  const handleSearchTodo = () =>  {
+  const handleSearchTodo = (e) =>  {
+    console.log('検索処理');
+      //どこかクリックされたときに上部のuseEffectで検索条件フラグfalseにするの防ぐため
+    e.stopPropagation();
+    if (!searchFlagRef.current) {
+      //ただ初回検索条件入れずに検索ボタン押下時はtrueにならない、、
+      searchFlagRef.current = true;
+    }
+
     //検索処理 
     let filteredTodos = null;
     // 名前検索
     const searchName = todoSearchNameRef.current.value;
+    console.log('検索名',searchName);
     if(!searchName && radioValue === 'all') {
       //検索値の名前に何も入ってない+購入フラグallの状態で検索してた場合は表示用setにそのまま最初のtoDosを入れる
       filteredTodos = toDos;
@@ -174,35 +223,44 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
           filteredTodos = filteredNameTodos.filter((todo) => todo.purchasedFlag === false);
         }
       }
-
+console.log('条件あり検索filtertodo',filteredTodos);
     //日付検索
       let filterByDateTodos = null;
       if (startDate === null && endDate === null) {
         //日付選択なし
         setVisibleTodos(filteredTodos);
-        return;
-      } else if (startDate !== null && endDate === null) {
+        //return;
+      } 
+      if (startDate !== null && endDate === null) {
         //最初の日付だけ 選択あり
-        filterByDateTodos = filteredTodos.filter((todo) => new Date(todo.created_at) >= startDate);
-      } else if (startDate === null && endDate !== null) {
+        filterByDateTodos = filteredTodos.filter((todo) => todo.created_at !== null && new Date(todo.created_at) >= startDate);
+      } 
+      if (startDate === null && endDate !== null) {
         //最後の日付だけ 選択あり
-        filterByDateTodos = filteredTodos.filter((todo) => new Date(todo.created_at) <= endDate);
-      } else if (startDate !== null && endDate !== null) {
+        const endDateWithTime = new Date(endDate);
+        endDateWithTime.setHours(23, 59, 59, 999);
+        filterByDateTodos = filteredTodos.filter((todo) => todo.created_at !== null && new Date(todo.created_at) <= endDateWithTime);
+      } 
+      if (startDate !== null && endDate !== null) {
         //最初も最後も日付選択あり
         filterByDateTodos = filteredTodos.filter((todo) => {
-          const formatedDate = new Date(todo.created_at);
-          return startDate <= formatedDate && endDate >= formatedDate;
+          if (todo.created_at !== null) {
+            const formatedDate = new Date(todo.created_at);
+            const endDateWithTime = new Date(endDate);
+            endDateWithTime.setHours(23, 59, 59, 999);
+            return startDate <= formatedDate && endDateWithTime >= formatedDate;
+          }
         });
       }
 
       if (filterByDateTodos !== null) {
         setVisibleTodos(filterByDateTodos);
       }
+      //検索ボタンが押されたかどうか
     
-
-    //setVisibleTodos(filteredTodos);
     //ref初期化
-    todoSearchNameRef.current.value = null;
+    //検索直後消えちゃうから削除
+    //todoSearchNameRef.current.value = null;
   }
 
   const handleOnSave = (updateTodo) => {
@@ -226,13 +284,14 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
 
   const handleSearchRequestClear = () => {
     //検索条件初期化
-    //名前検索ref初期化
-    todoSearchNameRef.current.value = null;
-    //日付初期化
-    setStartDate(null);
-    setEndDate(null);
-    //購入フラグ初期化
-    setRadioValue('all');
+      //名前検索初期化
+      todoSearchNameRef.current.value = null;
+      setTodoSearchName("");
+      //日付初期化
+      setStartDate(null);
+      setEndDate(null);
+      //購入フラグ初期化
+      setRadioValue('all');
   }
 
   useEffect(() => {
@@ -267,7 +326,7 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
         <div className="p-1 text-gray-500 font-bold bg-sky-200 shadow-md ">リスト検索</div>
           <div className="flex items-center mt-3">
             <div className="mx-4 crayon-orange-g-narrow w-fit">名前検索</div>
-            <input type="text" className=" mx-16 my-3 px-4 py-1 border border-gray-300 focus:outline-none focus:ring-0 rounded-full text-lg" ref={todoSearchNameRef}></input>
+            <input type="text" className=" mx-16 my-3 px-4 py-1 border border-gray-300 focus:outline-none focus:ring-0 rounded-full text-lg" ref={todoSearchNameRef} value={todoSearchName} onChange={(e) => setTodoSearchName(e.target.value)}></input>
           </div>
           <div className="flex items-center">
             <div className="mx-4 crayon-orange-g-narrow w-fit">買った日</div>
@@ -314,7 +373,7 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
             <div className="flex justify-center flex-1">
               <button 
                 className="w-40 mt-4 px-2 py-1 text-center bg-sky-400 rounded-md text-lg text-white hover:bg-sky-500" 
-                onClick={handleSearchTodo}
+                onClick={((e) => handleSearchTodo(e))}
                 >
                 検索
               </button>
@@ -332,7 +391,7 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
       
       <div className="m-3 px-2 text-red-600 font-medium">※ 未購入のもの：{visibleTodos?.filter((todo) => !todo.purchasedFlag).length}</div>
       <TodoList todos={toDos} visibleTodos={visibleTodos} toggleTodo={toggleTodo} toggleSelect={toggleSelect} handleDeleteSelected={handleDeleteSelected
-      } handleOnSave={handleOnSave}/>
+      } handleOnSave={handleOnSave} isSearchConditions={isSearchConditions} searchFlagRef={searchFlagRef.current}/>
     </div>
     </>
   );

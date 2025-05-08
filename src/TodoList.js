@@ -1,16 +1,19 @@
-import {React, useState} from 'react'
+import {React, useState, useEffect} from 'react'
 import Todo from './Todo';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { Pagination, Stack } from '@mui/material'; 
 
 
-const TodoList = ({todos, visibleTodos, toggleTodo, toggleSelect, handleDeleteSelected, handleOnSave,  ...props}) => {
+const TodoList = ({todos, visibleTodos, toggleTodo, toggleSelect, handleDeleteSelected, handleOnSave, isSearchConditions, searchFlagRef,   ...props}) => {
   //todos.map((todo) => <Todo todo={todo} key={todo.id} toggleTodo={toggleTodo}/>);
   console.log('リストに来てるvisibleTodos',visibleTodos);
   const [modal, setModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
 console.log('選択したtodo',selectedTodo);
+console.log('isSearchConditionsのリストに来てるデータ中身',isSearchConditions);
+console.log('searchFlagRefのリストに来てるデータ中身',searchFlagRef);
+
   const handlePurchaseFlagChange = (id) => {
     //購入フラグ変更
     toggleTodo(id);
@@ -26,7 +29,14 @@ console.log('選択したtodo',selectedTodo);
     // 1ページあたりの表示数
     const ITEMS_PER_PAGE = 10; 
     const [page, setPage] = useState(1);
-
+console.log('ペーひねーとpage', page);
+    useEffect(() => {
+      if (searchFlagRef === true && isSearchConditions === false) {
+        //検索条件に何も入れないで検索すると最初のページに戻る（にしたいが、最初に検索条件に入れて検索したからじゃないと今は発動しない）
+        setPage(1);
+      }
+    },[searchFlagRef, isSearchConditions]);
+  
     const pageCount = Math.ceil(visibleTodos.length / ITEMS_PER_PAGE);
 
     const handlePageChange = (event, value) => {
@@ -34,9 +44,18 @@ console.log('選択したtodo',selectedTodo);
     };
 
     const startItemIndex = (page - 1) * ITEMS_PER_PAGE;
-    const paginatedTodos = visibleTodos.slice(startItemIndex, startItemIndex + ITEMS_PER_PAGE);
-
-
+    //時際に表示するページネーション聞いたデータ
+    let paginatedTodos = null;
+     paginatedTodos = visibleTodos.slice(startItemIndex, startItemIndex + ITEMS_PER_PAGE);
+    console.log('ページネーションstartItemIndex',startItemIndex);
+    if (paginatedTodos.length === 0) {
+      //ページネート動かした後に検索した時の結果データ表示
+      paginatedTodos = visibleTodos;
+    } else {
+      //初期のページネート動作時
+      paginatedTodos = visibleTodos.slice(startItemIndex, startItemIndex + ITEMS_PER_PAGE);
+    }
+console.log('ページネーションの結果のデータpaginationTodos',paginatedTodos);
 
   return (
     <div className="ml-2">
