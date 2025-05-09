@@ -1,8 +1,8 @@
 import TodoList from "./TodoList";
 import { useState ,useRef, useEffect } from "react";
 import {v4 as uuidv4} from "uuid";
-import 'bootstrap/dist/css/bootstrap.min.css'; // BootstrapのCSSをインポート
-import Button from 'react-bootstrap/Button'; // React BootstrapのButtonコンポーネントをインポート
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button'; 
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import DatePicker from "react-datepicker"
@@ -129,15 +129,14 @@ console.log('日付検索　最後の日付', endDate ? format(endDate, 'yyyy-MM
     if (value === 'unpurchased') return 'outline-danger';
   }
 
-
   const handleAddTOdo = () => {
     //タスク追加
     const name = todoNameRef.current.value;
     //からの名前のタスクは追加できないように追加
     if(name === "") return;
     setTodos((preveTodos) => {
-  
-      return [...preveTodos, {id:uuidv4(), name:name, amount:null, created_at:null, memo:null, purchasedFlag:false, selected: false}];
+    //追加の順番は新しく追加されたデータ▶︎前のデータ　で追加
+      return [{id:uuidv4(), name:name, amount:null, created_at:null, memo:null, purchasedFlag:false, selected: false}, ...preveTodos];
     })
     todoNameRef.current.value = null;
     setAddTodoFlag(true);
